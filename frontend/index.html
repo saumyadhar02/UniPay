@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniPay - Digital Wallet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-circle {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }.btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .link-btn {
+            text-align: center;
+            margin-top: 15px;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .link-btn:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+        }
+
+        .alert-success {
+            background: #efe;
+            border: 1px solid #cfc;
+            color: #3c3;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .balance-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .balance-amount {
+            font-size: 42px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .balance-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .action-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .action-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }.transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 15px;
+        }
+
+        .transaction-credit .transaction-icon {
+            background: #e8f5e9;
+            color: #4caf50;
+        }
+
+        .transaction-debit .transaction-icon {
+            background: #ffebee;
+            color: #f44336;
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .transaction-amount {
+            text-align: right;
+        }
+
+        .transaction-credit .amount {
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .transaction-debit .amount {
+            color: #f44336;
+            font-weight: bold;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            color: #999;
+            transition: all 0.3s;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+        }
+
+        .header {
+            background: white;
+            padding: 15px 20px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }.logout-btn {
+            color: #f44336;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            text-decoration: underline;
+        }
+
+        .demo-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #1976d2;
+        }
+
+        .voucher-list {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .voucher-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+
+        .voucher-code {
+            font-family: monospace;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+
+        .profile-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-row:last-child {
+            border-bottom: none;
+        }
+
+        /* Bills grid */
+        .bills-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .bills-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .bill-option {
+            background: #fff;
+            border-radius: 14px;
+            padding: 18px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+
+        .bill-option:hover { transform: translateY(-6px); box-shadow: 0 12px 28px rgba(0,0,0,0.12); }
+
+        .bill-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #fff;
+            margin-bottom: 10px;
+            box-shadow: 0 8px 18px rgba(102,126,234,0.18);
+        }
+
+        .bill-label { font-weight: 700; color: #333; font-size: 13px; }
+
+        /* Styled select for subscriptions */
+        .styled-select {
+            position: relative;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .styled-select select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 100%;
+            padding: 12px 40px 12px 14px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #222; /* make selected text dark for readability */
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 6px 18px rgba(118,75,162,0.12);
+        }
+
+        /* Attempt to style native option list text where supported */
+        .styled-select select option {
+            color: #222;
+            background: #fff;
+        }
+
+        .styled-select:after {
+            content: "▾";
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: rgba(255,255,255,0.95);
+            font-weight: 700;
+        }
+
+        .profile-label {
+            color: #666;
+        }
+
+        .profile-value {
+            font-weight: 600;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Page -->
+        <div id="loginPage" class="page active">
+            <div class="card">
+                <div class="logo">
+                    <div class="logo-circle">💰</div>
+                    <h1>UniPay</h1>
+                    <p class="subtitle">Bank-Free Digital Wallet</p>
+                </div>
+
+                <div id="loginAlert"></div>
+
+                <!-- Login form: discourage password managers from autofilling credentials -->
+                <form id="loginForm" autocomplete="off" onsubmit="event.preventDefault(); login();">
+                    <!-- Hidden dummy fields many password managers look for -->
+                    <input type="text" name="username_fake" id="username_fake" style="display:none!important" autocomplete="username">
+                    <input type="password" name="password_fake" id="password_fake" style="display:none!important" autocomplete="new-password">
+
+                    <div class="input-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="loginPhone" name="loginPhone" placeholder="Enter phone number" maxlength="10" autocomplete="off" inputmode="numeric" pattern="[0-9]*" autocorrect="off" spellcheck="false">
+                    </div>
+
+                    <div class="input-group">
+                        <label>PIN</label>
+                        <input type="password" id="loginPin" name="loginPin" placeholder="Enter 4-digit PIN" maxlength="4" autocomplete="new-password" inputmode="numeric" pattern="[0-9]*">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+
+                <div class="link-btn" onclick="showPage('registerPage')">
+                    Don't have an account? Register
+                </div>
+
+                <div class="demo-info">
+                    <strong>Demo Account:</strong><br>
+                    Phone: 9876543210<br>
+                    PIN: 1234
+                </div>
+            </div>
+        </div>
+
+        <!-- Register Page -->
+        <div id="registerPage" class="page">
+            <div class="card">
+                <h2>Create Account</h2>
+
+                <div id="registerAlert"></div>
+
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="regName" placeholder="Enter your name">
+                </div>
+
+                <div class="input-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="regPhone" placeholder="10-digit phone number" maxlength="10">
+                </div>
+
+                <div class="input-group">
+                    <label>Create PIN</label>
+                    <input type="password" id="regPin" placeholder="4-digit PIN" maxlength="4">
+                </div><div class="input-group">
+                    <label>Confirm PIN</label>
+                    <input type="password" id="regConfirmPin" placeholder="Re-enter PIN" maxlength="4">
+                </div>
+
+                <button class="btn btn-primary" onclick="register()">Register</button>
+
+                <div class="link-btn" onclick="showPage('loginPage')">
+                    Already have an account? Login
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboardPage" class="page">
+            <!-- Home Tab -->
+            <div id="homeTab" class="tab-content">
+                <div class="balance-card">
+                    <div class="balance-label">Total Balance</div>
+                    <div class="balance-amount" id="balanceAmount">₹0.00</div>
+                    <div class="balance-info">
+                        <span id="walletIdDisplay">Wallet ID: -</span>
+                        <span id="phoneDisplay">-</span>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <div class="action-card" onclick="showTab('sendTab')">
+                        <div class="action-icon">💸</div>
+                        <div>Send Money</div>
+                    </div>
+                    <div class="action-card" onclick="showTab('topupTab')">
+                        <div class="action-icon">📥</div>
+                        <div>Top Up</div>
+                    </div>
+                    <div class="action-card" onclick="showTab('qrTab')">
+                        <div class="action-icon">📱</div>
+                        <div>Scan QR</div>
+                    </div>
+                    <div class="action-card" onclick="showTab('billsTab')">
+                        <div class="action-icon">🧾</div>
+                        <div>Pay Bills</div>
+                    </div>
+                    <div class="action-card" onclick="showTab('invoicesTab')">
+                        <div class="action-icon">🧾</div>
+                        <div>Invoices</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Recent Transactions</h2>
+                    <div id="recentTransactions">
+                        <p style="text-align: center; color: #999; padding: 20px 0;">No transactions yet</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Send Tab -->
+            <div id="sendTab" class="tab-content" style="display: none;">
+                <div class="card">
+                    <div class="header">
+                        <div class="header-title">
+                            <span>💸</span> Send Money
+                        </div>
+                        <div class="logout-btn" onclick="logout()">Logout</div>
+                    </div>
+
+                    <div id="sendAlert"></div>
+
+                    <div class="input-group">
+                        <label>Recipient (Phone/Wallet ID)</label>
+                        <input type="text" id="recipient" placeholder="Enter phone or wallet ID">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Amount (₹)</label>
+                        <input type="number" id="sendAmount" placeholder="0.00">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Enter PIN</label>
+                        <input type="password" id="sendPin" placeholder="4-digit PIN" maxlength="4">
+                    </div>
+
+                    
+
+                    <button class="btn btn-primary" onclick="sendMoney()">Send Money</button>
+                    <button id="payViaUpiBtn" class="btn" style="margin-left:8px;display:none;background:#0b5;" onclick="payViaUPIFromForm()">Pay via UPI</button>
+                    <div style="margin-top:16px">
+                        <strong>Contacts</strong>
+                        <div id="contactsContainer" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px"></div>
+                    </div>
+
+                    <div style="margin-top:12px">
+                        <strong>Frequent Recipients</strong>
+                        <div id="favoritesContainer" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px"></div>
+                        <div style="display:flex;gap:8px;margin-top:8px">
+                            <button class="btn" style="flex:1;background:#fff;color:#333;" onclick="addFavoriteFromForm()">Add to Frequent</button>
+                            <button class="btn" style="flex:1;background:#f5f5f5;color:#333;" onclick="openFavoritesManager()">Manage</button>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- Top Up Tab -->
+            <div id="topupTab" class="tab-content" style="display: none;">
+                <div class="card">
+                    <div class="header">
+                        <div class="header-title">
+                            <span>📥</span> Top Up Wallet
+                        </div>
+                        <div class="logout-btn" onclick="logout()">Logout</div>
+                    </div>
+
+                    <div id="topupAlert"></div>
+
+                    <div class="input-group">
+                        <label>Voucher Code</label>
+                        <input type="text" id="voucherCode" placeholder="Enter voucher code" style="text-transform: uppercase;">
+                    </div><button class="btn btn-primary" onclick="topUp()">Add to Wallet</button>
+
+                    <div class="voucher-list">
+                        <h3 style="margin-bottom: 10px; color: #333;">Demo Voucher Codes:</h3>
+                        <div class="voucher-item">
+                            <span class="voucher-code">UNIPAY100</span>
+                            <span>₹100</span>
+                        </div>
+                        <div class="voucher-item">
+                            <span class="voucher-code">UNIPAY500</span>
+                            <span>₹500</span>
+                        </div>
+                        <div class="voucher-item">
+                            <span class="voucher-code">UNIPAY1000</span>
+                            <span>₹1,000</span>
+                        </div>
+                        <div class="voucher-item">
+                            <span class="voucher-code">UNIPAY5000</span>
+                            <span>₹5,000</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bills Tab -->
+            <div id="billsTab" class="tab-content" style="display: none;">
+                <div class="card">
+                    <div class="header">
+                        <div class="header-title">🧾 Pay Bills</div>
+                        <div class="logout-btn" onclick="logout()">Logout</div>
+                    </div>
+
+                    <div id="billsAlert"></div>
+
+                    <div class="input-group">
+                        <label>Select Bill Type</label>
+                        <div class="bills-grid">
+                            <div class="bill-option" onclick="prepareBill('electricity')">
+                                <div class="bill-icon" style="background:linear-gradient(135deg,#f6b042 0%,#f47b20 100%)">⚡️</div>
+                                <div class="bill-label">Electricity</div>
+                            </div>
+
+                            <div class="bill-option" onclick="prepareBill('water')">
+                                <div class="bill-icon" style="background:linear-gradient(135deg,#42a5f5 0%,#1e88e5 100%)">💧</div>
+                                <div class="bill-label">Water</div>
+                            </div>
+
+                            <div class="bill-option" onclick="prepareBill('mobile')">
+                                <div class="bill-icon" style="background:linear-gradient(135deg,#8e24aa 0%,#5e35b1 100%)">📱</div>
+                                <div class="bill-label">Mobile</div>
+                            </div>
+
+                            <div class="bill-option" onclick="prepareBill('dth')">
+                                <div class="bill-icon" style="background:linear-gradient(135deg,#66bb6a 0%,#43a047 100%)">📺</div>
+                                <div class="bill-label">DTH</div>
+                            </div>
+
+                            <div class="bill-option" onclick="prepareBill('dmrc')">
+                                <div class="bill-icon" style="background:linear-gradient(135deg,#ff7043 0%,#ff5722 100%)">🚇</div>
+                                <div class="bill-label">DMRC</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="billForm" style="display:none; margin-top:10px">
+                        <div class="input-group">
+                            <label id="billLabel">Account / Number</label>
+                            <input type="text" id="billAccount" placeholder="Account or Phone">
+                        </div>
+                        <div class="input-group">
+                            <label>Amount (₹)</label>
+                            <input type="number" id="billAmount" placeholder="0.00">
+                        </div>
+                        <div class="input-group">
+                            <label>Enter PIN</label>
+                            <input type="password" id="billPin" placeholder="4-digit PIN" maxlength="4">
+                        </div>
+                        <button class="btn btn-primary" onclick="payBill()">Pay Bill</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QR Tab -->
+            <div id="qrTab" class="tab-content" style="display: none;">
+                <div class="card">
+                    <div class="header">
+                        <div class="header-title">📱 Scan QR</div>
+                        <div class="logout-btn" onclick="logout()">Logout</div>
+                    </div>
+
+                    <div id="qrAlert"></div>
+
+                    <div style="margin-bottom:10px">
+                        <button class="btn btn-primary" onclick="startQRScan()">Start Camera Scan</button>
+                    </div>
+
+                    <div style="margin-bottom:10px">
+                        <label>Or paste QR payload</label>
+                        <input type="text" id="qrPaste" placeholder="e.g. pay:9876543210:100 or service:electricity:account:100">
+                        <button class="btn" style="margin-top:8px;background:#fff;color:#333;" onclick="processQRPaste()">Use Payload</button>
+                    </div>
+
+                    <div id="qrVideoContainer" style="display:none;">
+                        <video id="qrVideo" autoplay muted playsinline style="width:100%;border-radius:12px"></video>
+                        <button class="btn" style="margin-top:8px;background:#fff;color:#333;" onclick="stopQRScan()">Stop Scan</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invoices / Merchant Tab -->
+            <div id="invoicesTab" class="tab-content" style="display: none;">
+                <div class="card">
+                    <div class="header">
+                        <div class="header-title">💳 Invoices</div>
+                        <div class="logout-btn" onclick="logout()">Logout</div>
+                    </div>
+
+                    <div id="invoiceAlert"></div>
+
+                    <h3>Create Invoice</h3>
+                    <div class="input-group">
+                        <label>Merchant / Payee Name</label>
+                        <input type="text" id="invMerchant" placeholder="Merchant name">
+                    </div>
+                    <div class="input-group">
+                        <label>Amount (₹)</label>
+                        <input type="number" id="invAmount" placeholder="0.00">
+                    </div>
+                    <div class="input-group">
+                        <label>Description</label>
+                        <input type="text" id="invDesc" placeholder="Invoice description">
+                    </div>
+                    <button class="btn btn-primary" onclick="createInvoice()">Create Invoice</button>
+
+                    <hr style="margin:18px 0">
+
+                    <h3>Available Invoices</h3>
+                    <div id="invoicesList">
+                        <p style="text-align:center;color:#999;padding:12px 0;">No invoices</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div id="historyTab" class="tab-content" style="display: none;">
+                <div class="card">
+                    <div class="header">
+                        <div class="header-title">
+                            <span>📜</span> Transaction History
+                        </div>
+                        <div class="logout-btn" onclick="logout()">Logout</div>
+                    </div>
+                    <div id="allTransactions">
+                        <p style="text-align: center; color: #999; padding: 20px 0;">No transactions yet</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="profileTab" class="tab-content" style="display: none;">
+                <div class="card">
+                    <div class="header">
+                        <div class="header-title">
+                            <span>👤</span> Profile
+                        </div>
+                        <div class="logout-btn" onclick="logout()">Logout</div>
+                    </div>
+
+                    <div class="profile-avatar" id="profileAvatar">J</div>
+
+                    <div class="profile-row">
+                        <span class="profile-label">Name</span>
+                        <span class="profile-value" id="profileName">-</span>
+                    </div>
+                    <div class="profile-row">
+                        <span class="profile-label">Phone Number</span>
+                        <span class="profile-value" id="profilePhone">-</span>
+                    </div>
+                    <div class="profile-row">
+                        <span class="profile-label">Wallet ID</span>
+                        <span class="profile-value" id="profileWalletId">-</span>
+                    </div>
+                    <div class="profile-row">
+                        <span class="profile-label">Current Balance</span>
+                        <span class="profile-value" id="profileBalance">₹0.00</span>
+                    </div>
+                    <div class="profile-row">
+                        <span class="profile-label">Total Transactions</span>
+                        <span class="profile-value" id="profileTransactions">0</span>
+                    </div>
+
+                    <div class="demo-info" style="margin-top: 20px;">
+                        <strong>🛡️ Security</strong><br>
+                        Your account is protected with PIN authentication
+                    </div>
+                    
+                    <div style="margin-top:20px">
+                        <h3>Your QR</h3>
+                        <div id="personalQrContainer" style="text-align:center;margin-bottom:10px">
+                            <canvas id="personalQrCanvas" style="max-width:200px;display:none"></canvas>
+                            <img id="personalQrImg" alt="Your QR" style="max-width:200px;display:none;border-radius:12px" />
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:8px">
+                            <input id="vpaInput" placeholder="Enter VPA (vpa@bank)" style="padding:10px;border-radius:10px;border:1px solid #ddd;" />
+                            <button class="btn" style="width:auto;padding:10px 14px;" onclick="saveVpa()">Save VPA</button>
+                        </div>
+                        <div style="text-align:center;margin-bottom:8px;color:#555">Saved VPA: <span id="profileVpa">-</span> <button class="btn" style="display:inline-block;width:auto;padding:6px 10px;margin-left:8px;background:#fff;color:#333;" onclick="copyVpa()">Copy</button></div>
+                        <div style="text-align:center;margin-bottom:6px"><button class="btn" onclick="generatePersonalQR()">Show My QR</button></div>
+                    </div>
+
+                    <div style="margin-top:20px">
+                        <h3>Subscriptions</h3>
+                        <div id="subsAlert"></div>
+                        <div class="input-group">
+                            <label>Service</label>
+                            <div class="styled-select">
+                                <select id="subService">
+                                    <option value="netflix">Netflix</option>
+                                    <option value="spotify">Spotify</option>
+                                    <option value="prime">Prime Video</option>
+                                    <option value="hotstar">Disney+ Hotstar</option>
+                                    <option value="youtube">YouTube Premium</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Payee (phone/account)</label>
+                            <input type="text" id="subPayee" placeholder="e.g. 9876543210 or account id">
+                        </div>
+                        <div class="input-group">
+                            <label>Amount (₹)</label>
+                            <input type="number" id="subAmount" placeholder="0.00">
+                        </div>
+                        <div class="input-group">
+                            <label>Next Payment Date</label>
+                            <input type="date" id="subNextDate">
+                        </div>
+                        <div class="input-group">
+                            <label>Frequency</label>
+                            <div class="styled-select">
+                                <select id="subFreq">
+                                    <option value="monthly">Monthly</option>
+                                    <option value="quarterly">Quarterly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="createSubscription()">Create Subscription</button>
+
+                        <div style="margin-top:15px">
+                            <h4>Active Subscriptions</h4>
+                            <div id="subsList">No subscriptions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- Bottom Navigation -->
+    <div id="bottomNav" class="bottom-nav" style="display: none;">
+        <div class="nav-item active" onclick="showTab('homeTab')">
+            <div class="nav-icon">🏠</div>
+            <div class="nav-label">Home</div>
+        </div>
+        <div class="nav-item" onclick="showTab('sendTab')">
+            <div class="nav-icon">💸</div>
+            <div class="nav-label">Send</div>
+        </div>
+        <div class="nav-item" onclick="showTab('topupTab')">
+            <div class="nav-icon">📥</div>
+            <div class="nav-label">Top Up</div>
+        </div>
+        <div class="nav-item" onclick="showTab('historyTab')">
+            <div class="nav-icon">📜</div>
+            <div class="nav-label">History</div>
+        </div>
+        <div class="nav-item" onclick="showTab('profileTab')">
+            <div class="nav-icon">👤</div>
+            <div class="nav-label">Profile</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <script>
+    // --- Storage keys ---
+    const USERS_KEY = 'unipay_users_v1';
+    const INVOICES_KEY = 'unipay_invoices_v1';
+    const SUBS_KEY = 'unipay_subs_v1';
+
+    let users = {};
+    let currentUser = null; // phone string
+
+    // --- Persistence ---
+    function loadUsers(){
+        try{ users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}'); }catch(e){ users = {}; }
+        if(Object.keys(users).length===0) initDemoData();
+    }
+    function saveUsers(){ localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
+
+    function loadSubs(){
+        try{return JSON.parse(localStorage.getItem(SUBS_KEY) || '{}');}catch(e){return {};}
+    }
+    function saveSubs(s){ localStorage.setItem(SUBS_KEY, JSON.stringify(s)); }
+
+    // --- Demo data ---
+    function initDemoData(){
+        users = {
+            '9876543210': {
+                phone: '9876543210',
+                name: 'Demo User',
+                pin: '1234',
+                walletId: 'W' + Date.now().toString().slice(-6),
+                balance: 1000,
+                transactions: []
+            }
+        };
+        saveUsers();
+    }
+
+    // --- Navigation ---
+    function showPage(pageId){
+        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+        const el = document.getElementById(pageId);
+        if(el) el.classList.add('active');
+        // show/hide bottom nav
+        document.getElementById('bottomNav').style.display = (pageId==='dashboardPage' && currentUser)?'flex':'none';
+    }
+
+    function showTab(tabId){
+        document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
+        const el = document.getElementById(tabId);
+        if(el) el.style.display='block';
+        if(tabId==='homeTab' || tabId==='historyTab') updateTransactions();
+        if(tabId==='profileTab') updateProfile();
+    }
+
+    // --- Alerts ---
+    function showAlert(id,msg,type){
+        const el = document.getElementById(id); if(!el) return;
+        el.innerHTML = `<div class="alert ${type==='error'?'alert-error':'alert-success'}">${msg}</div>`;
+        setTimeout(()=>{ if(el) el.innerHTML=''; },3500);
+    }
+
+    // --- Auth ---
+    function register(){
+        const name = document.getElementById('regName').value.trim();
+        const phone = document.getElementById('regPhone').value.trim();
+        const pin = document.getElementById('regPin').value.trim();
+        const confirmPin = document.getElementById('regConfirmPin').value.trim();
+        if(!name||phone.length!==10||pin.length!==4||pin!==confirmPin){ showAlert('registerAlert','Please fill correctly','error'); return; }
+        if(users[phone]){ showAlert('registerAlert','Phone already registered','error'); return; }
+        users[phone] = {name, phone, pin, walletId:'W'+Math.floor(Math.random()*900000+100000), balance:0, transactions:[]};
+        saveUsers();
+        showAlert('registerAlert','Account created — please login','success');
+        setTimeout(()=>showPage('loginPage'),1000);
+    }
+
+    function login(){
+        loadUsers();
+        const phone = document.getElementById('loginPhone').value.trim();
+        const pin = document.getElementById('loginPin').value.trim();
+        if(phone.length!==10||pin.length===0){ showAlert('loginAlert','Enter phone & PIN','error'); return; }
+        const user = users[phone];
+        if(!user||user.pin!==pin){ showAlert('loginAlert','Invalid phone or PIN','error'); return; }
+        currentUser = phone;
+        showPage('dashboardPage');
+        showTab('homeTab');
+        updateDashboard(); updateTransactions(); updateProfile(); renderSubscriptions();
+    }
+
+    function logout(){ currentUser=null; showPage('loginPage'); showAlert('loginAlert','Logged out','success'); }
+
+    // --- Dashboard / Profile ---
+    function updateDashboard(){ if(!currentUser) return; const u = users[currentUser]; document.getElementById('balanceAmount').textContent = '₹'+(u.balance||0).toFixed(2); document.getElementById('walletIdDisplay').textContent = 'Wallet ID: '+(u.walletId||'-'); document.getElementById('phoneDisplay').textContent = u.phone; }
+
+    function updateProfile(){
+        if(!currentUser) return;
+        const u = users[currentUser];
+        // display name forced to 'Saumya' per request (capital S)
+        // persist the display name into stored user so it survives reload
+        u.name = 'Saumya';
+        saveUsers();
+        document.getElementById('profileName').textContent = u.name;
+        document.getElementById('profilePhone').textContent = u.phone;
+        document.getElementById('profileWalletId').textContent = u.walletId;
+        document.getElementById('profileBalance').textContent = '₹'+(u.balance||0).toFixed(2);
+        document.getElementById('profileTransactions').textContent = u.transactions.length;
+        document.getElementById('profileAvatar').textContent = (u.name||'s').charAt(0).toUpperCase();
+        // show saved VPA if any and populate input
+        const vpaSpan = document.getElementById('profileVpa'); if(vpaSpan) vpaSpan.textContent = u.vpa || '-';
+        const vpaInput = document.getElementById('vpaInput'); if(vpaInput) vpaInput.value = u.vpa || '';
+    }
+
+    // --- Transactions UI ---
+    function updateTransactions(){ if(!currentUser) return; const u = users[currentUser]; const recentDiv = document.getElementById('recentTransactions'); const allDiv = document.getElementById('allTransactions'); const tx = (u.transactions||[]).slice().reverse(); if(tx.length===0){ recentDiv.innerHTML = allDiv.innerHTML = '<p style="text-align:center;color:#999;padding:20px 0;">No transactions yet</p>'; return; } const html = tx.map(t=>`<div class="transaction-item transaction-${t.type}"><div class="transaction-icon">${t.type==='credit'?'⬆️':'⬇️'}</div><div class="transaction-details"><div class="transaction-title">${t.desc}</div><div class="transaction-date">${new Date(t.date).toLocaleString()}</div></div><div class="transaction-amount">${t.type==='credit'?'+':'-'}₹${t.amount.toFixed(2)}</div></div>`).join(''); recentDiv.innerHTML = html.split('</div>').slice(0,6).join('</div>'); allDiv.innerHTML = html; }
+
+    // --- Pay Bills / Services ---
+    let currentBillService = null;
+    function prepareBill(service){ currentBillService = service; document.getElementById('billForm').style.display='block'; const label = {electricity:'Consumer / Account No', water:'Connection / Account', mobile:'Mobile Number', dth:'Subscriber ID', dmrc:'Metro Card No'}[service]||'Account'; document.getElementById('billLabel').textContent = label; }
+
+    function payBill(){ if(!currentUser) return; const acct = document.getElementById('billAccount').value.trim(); const amount = parseFloat(document.getElementById('billAmount').value); const pin = document.getElementById('billPin').value.trim(); if(!acct||!amount||!pin){ showAlert('billsAlert','Fill all fields','error'); return; } const u = users[currentUser]; if(pin!==u.pin){ showAlert('billsAlert','Incorrect PIN','error'); return; } if(amount<=0||amount>u.balance){ showAlert('billsAlert','Insufficient balance','error'); return; } u.balance -= amount; const timestamp = new Date().toISOString(); u.transactions.push({id:Date.now(), type:'debit', amount, desc:`Paid ${currentBillService} - ${acct}`, date:timestamp, balance:u.balance}); saveUsers(); showAlert('billsAlert',`Paid ₹${amount.toFixed(2)} for ${currentBillService}`,'success'); updateDashboard(); updateTransactions(); document.getElementById('billAccount').value=''; document.getElementById('billAmount').value=''; document.getElementById('billPin').value=''; }
+
+    // --- QR scan and paste processing ---
+    let qrStream = null; let qrScanInterval = null;
+    async function startQRScan(){
+        const video = document.getElementById('qrVideo');
+        const container = document.getElementById('qrVideoContainer');
+        if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ showAlert('qrAlert','Camera not supported. Use paste.', 'error'); return; }
+        try{
+            const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+            qrStream = stream; video.srcObject = stream; container.style.display='block';
+            await video.play();
+            if(window.BarcodeDetector){
+                const detector = new BarcodeDetector({formats:['qr_code']});
+                qrScanInterval = setInterval(async ()=>{
+                    try{
+                        const codes = await detector.detect(video);
+                        if(codes && codes.length){ parseQRPayload(codes[0].rawValue); stopQRScan(); }
+                    }catch(e){ /* ignore frame errors */ }
+                },400);
+            }else{
+                // fallback: capture image frames and try to decode via canvas if needed - but we'll use paste fallback
+                showAlert('qrAlert','Camera scanning started — your browser may not support native QR detection. Use paste if it fails.','success');
+            }
+        }catch(err){ showAlert('qrAlert','Camera access denied or error','error'); }
+    }
+    function stopQRScan(){ if(qrStream){ qrStream.getTracks().forEach(t=>t.stop()); qrStream=null; } const video = document.getElementById('qrVideo'); video.pause(); document.getElementById('qrVideoContainer').style.display='none'; if(qrScanInterval){ clearInterval(qrScanInterval); qrScanInterval=null; } }
+
+    function processQRPaste(){ const payload = document.getElementById('qrPaste').value.trim(); if(!payload) return showAlert('qrAlert','Paste QR payload','error'); parseQRPayload(payload); }
+
+    function parseQRPayload(payload){
+        // support: pay:PHONE:AMOUNT
+        // service:TYPE:ACCOUNT:AMOUNT
+        // unipay://pay?to=...&amount=...
+        let p = payload.trim();
+        // UPI payload: upi://pay?pa=...&am=...
+        if(p.startsWith('upi://')){
+            try{
+                const url = new URL(p);
+                const pa = url.searchParams.get('pa');
+                // Some QR encoders use 'am' or 'amount'
+                const rawAmt = url.searchParams.get('am') || url.searchParams.get('amount');
+                const amount = rawAmt ? parseFloat(rawAmt) : NaN;
+                if(pa) return processUPIPayload(pa, isNaN(amount) ? null : amount);
+            }catch(e){ }
+        }
+        if(p.startsWith('unipay://')){
+            try{
+                const url = new URL(p);
+                const to = url.searchParams.get('to'); const amount = parseFloat(url.searchParams.get('amount'));
+                if(to && amount) return payToPhone(to, amount);
+            }catch(e){}
+        }
+        const parts = p.split(':');
+        if(parts[0]==='pay' && parts.length>=3){ const to=parts[1]; const amt=parseFloat(parts[2]); return payToPhone(to,amt); }
+        if(parts[0]==='service' && parts.length>=4){ const svc=parts[1]; const acct=parts[2]; const amt=parseFloat(parts[3]); return payServicePayload(svc,acct,amt); }
+        showAlert('qrAlert','Unsupported QR payload','error');
+    }
+
+    function payToPhone(phone, amount){ if(!currentUser) return showAlert('qrAlert','Login first','error'); const recipient = users[phone]; if(!recipient) return showAlert('qrAlert','Recipient not found','error'); if(amount<=0||amount>users[currentUser].balance) return showAlert('qrAlert','Insufficient balance','error'); users[currentUser].balance -= amount; recipient.balance = (recipient.balance||0)+amount; const ts=new Date().toISOString(); users[currentUser].transactions.push({id:Date.now(),type:'debit',amount,desc:`Sent via QR to ${phone}`,date:ts,balance:users[currentUser].balance}); recipient.transactions.push({id:Date.now()+1,type:'credit',amount,desc:`Received via QR from ${currentUser}`,date:ts,balance:recipient.balance}); saveUsers(); updateDashboard(); updateTransactions(); showAlert('qrAlert',`Sent ₹${amount} to ${phone}`,'success'); }
+
+    async function processUPIPayload(pa, amount){
+        if(!currentUser) return showAlert('qrAlert','Login first','error');
+        // pa might be like walletid@unipay or vpa@bank
+        const paRaw = String(pa || '').trim();
+        let recipientRaw = paRaw;
+        // if pa is walletid@unipay, map to wallet id
+        if(paRaw.toLowerCase().endsWith('@unipay')){
+            recipientRaw = paRaw.split('@')[0];
+        } else if(/^[0-9]{10}@/.test(paRaw)){ // e.g. 9876543210@upi
+            recipientRaw = paRaw.split('@')[0];
+        }
+
+        // If amount wasn't encoded in the QR, ask the user to enter it.
+        let finalAmount = amount;
+        if(!finalAmount || isNaN(finalAmount) || finalAmount <= 0){
+            const input = prompt(`Amount not present in QR. Enter the amount to pay to ${paRaw} (leave blank to open UPI app instead):`);
+            if(!input){
+                // User chose not to enter amount — offer to open UPI app
+                const open = confirm('Open UPI app to pay this VPA instead?');
+                if(open){ openUPIPay(paRaw, null, `Payment to ${paRaw}`); }
+                return showAlert('qrAlert','Payment cancelled','error');
+            }
+            const parsed = parseFloat(input);
+            if(isNaN(parsed) || parsed <= 0) return showAlert('qrAlert','Invalid amount entered','error');
+            finalAmount = parsed;
+        }
+
+        // If recipient is an internal UniPay wallet (e.g., walletid@unipay) or looks like a phone-wallet, perform internal send
+        const isInternal = paRaw.toLowerCase().endsWith('@unipay') || /^[0-9]{6,}$/.test(recipientRaw);
+        if(!isInternal && paRaw.includes('@')){
+            // External VPA (bank UPI) — offer to open the UPI app with amount
+            const ok = confirm(`This looks like an external UPI VPA (${paRaw}). Open your UPI app to pay ₹${finalAmount.toFixed(2)}?`);
+            if(ok){ openUPIPay(paRaw, finalAmount, `Payment to ${paRaw}`); return; }
+            return showAlert('qrAlert','Payment cancelled','error');
+        }
+
+        // For internal UniPay recipients, confirm and ask for PIN
+        const okConfirm = confirm(`Pay ₹${finalAmount.toFixed(2)} to ${recipientRaw}?`);
+        if(!okConfirm) return showAlert('qrAlert','Payment cancelled','error');
+
+        const pin = prompt('Enter your 4-digit PIN to confirm payment');
+        if(!pin) return showAlert('qrAlert','PIN required to complete payment','error');
+
+        // reuse existing send flow: prefill fields and call sendMoney()
+        document.getElementById('recipient').value = recipientRaw;
+        document.getElementById('sendAmount').value = finalAmount;
+        document.getElementById('sendPin').value = pin;
+        await sendMoney();
+        // clear pin field
+        document.getElementById('sendPin').value = '';
+    }
+
+    function payServicePayload(service,acct,amount){ if(!currentUser) return showAlert('qrAlert','Login first','error'); if(amount<=0||amount>users[currentUser].balance) return showAlert('qrAlert','Insufficient balance','error'); users[currentUser].balance -= amount; const ts=new Date().toISOString(); users[currentUser].transactions.push({id:Date.now(),type:'debit',amount,desc:`Paid ${service} (${acct}) via QR`,date:ts,balance:users[currentUser].balance}); saveUsers(); updateDashboard(); updateTransactions(); showAlert('qrAlert',`Paid ₹${amount} for ${service}`,'success'); }
+
+    // --- Personal QR generation ---
+    function generatePersonalQR(){ if(!currentUser) return showAlert('subsAlert','Login to see QR','error'); const u = users[currentUser]; const payload = `unipay://user?phone=${u.phone}&wallet=${u.walletId}`; const img = document.getElementById('personalQrImg'); const canvas = document.getElementById('personalQrCanvas'); QRCode.toDataURL(payload, {width:300}, function(err,url){ if(err){ showAlert('subsAlert','QR generation failed','error'); return; } img.src = url; img.style.display='block'; canvas.style.display='none'; }); }
+    
+    function generatePersonalQR(){
+        if(!currentUser) return showAlert('subsAlert','Login to see QR','error');
+        const u = users[currentUser];
+        const img = document.getElementById('personalQrImg');
+        const canvas = document.getElementById('personalQrCanvas');
+        // Use saved VPA if present (real VPA), else create internal wallet VPA
+        const pa = u.vpa ? u.vpa.trim() : `${u.walletId.toLowerCase()}@unipay`;
+        const upiPayload = `upi://pay?pa=${encodeURIComponent(pa)}&pn=${encodeURIComponent(u.name||'UniPay User')}&cu=INR`;
+        // Also keep a fallback unipay URI
+        const uniPayload = `unipay://user?phone=${u.phone}&wallet=${u.walletId}`;
+        // Show the UPI QR and display the VPA under the QR
+        QRCode.toDataURL(upiPayload, {width:300}, function(err,url){
+            if(err){ showAlert('subsAlert','QR generation failed','error'); return; }
+            img.src = url; img.style.display='block'; canvas.style.display='none';
+            // update displayed saved VPA
+            const vpaSpan = document.getElementById('profileVpa'); if(vpaSpan) vpaSpan.textContent = pa;
+        });
+    }
+
+    function saveVpa(){ if(!currentUser) return showAlert('subsAlert','Login first','error'); const val = document.getElementById('vpaInput').value.trim(); if(!val || !val.includes('@')) return showAlert('subsAlert','Enter a valid VPA (e.g. yourid@bank)','error'); users[currentUser].vpa = val; saveUsers(); document.getElementById('profileVpa').textContent = val; showAlert('subsAlert','VPA saved','success'); }
+
+    // Save VPA to backend when authenticated
+    async function saveVpa(){
+        if(!currentUser) return showAlert('subsAlert','Login first','error');
+        const val = document.getElementById('vpaInput').value.trim();
+        if(!val || !val.includes('@')) return showAlert('subsAlert','Enter a valid VPA (e.g. yourid@bank)','error');
+        const token = localStorage.getItem('x-auth-token') || localStorage.getItem('unipay_token');
+        if(token){
+            try{
+                const resp = await fetch('/api/wallet/vpa',{ method:'POST', headers:{ 'Content-Type':'application/json','x-auth-token':token }, body: JSON.stringify({ vpa: val }) });
+                const data = await resp.json();
+                if(resp.ok && data && data.success){ document.getElementById('profileVpa').textContent = data.vpa; showAlert('subsAlert','VPA saved to your profile','success'); return; }
+                return showAlert('subsAlert',data.message||'Failed to save VPA','error');
+            }catch(e){ console.error('Save VPA error', e); return showAlert('subsAlert','Server error saving VPA','error'); }
+        }
+        // fallback local
+        users[currentUser].vpa = val; saveUsers(); document.getElementById('profileVpa').textContent = val; showAlert('subsAlert','VPA saved (local only)','success');
+    }
+
+    function copyVpa(){ const v = document.getElementById('profileVpa').textContent; if(!v || v==='-') return showAlert('subsAlert','No VPA to copy','error'); try{ navigator.clipboard.writeText(v); showAlert('subsAlert','VPA copied to clipboard','success'); }catch(e){ showAlert('subsAlert','Unable to copy VPA','error'); } }
+
+    // --- Subscriptions ---
+    function createSubscription(){ if(!currentUser) return showAlert('subsAlert','Login first','error'); const svc=document.getElementById('subService').value; const payee=document.getElementById('subPayee').value.trim(); const amt=parseFloat(document.getElementById('subAmount').value); const next=document.getElementById('subNextDate').value; const freq=document.getElementById('subFreq').value; if(!payee||!amt||!next) return showAlert('subsAlert','Fill all fields','error'); const subs = loadSubs(); if(!subs[currentUser]) subs[currentUser]=[]; const id = Date.now().toString(36); subs[currentUser].push({id,service:svc,payee,amount:amt,nextDate:next,freq}); saveSubs(subs); showAlert('subsAlert','Subscription created','success'); renderSubscriptions(); }
+
+    function renderSubscriptions(){ const subs = loadSubs(); const list = subs[currentUser]||[]; const container = document.getElementById('subsList'); if(!container) return; if(list.length===0){ container.innerHTML='No subscriptions'; return; } container.innerHTML = list.map(s=>`<div style="padding:8px;border-bottom:1px solid #eee"><strong>${s.service}</strong> — ₹${s.amount} — Next: ${s.nextDate} <button style="float:right" onclick="cancelSub('${s.id}')">Cancel</button></div>`).join(''); }
+
+    function cancelSub(id){ const subs = loadSubs(); if(!subs[currentUser]) return; subs[currentUser]=subs[currentUser].filter(s=>s.id!==id); saveSubs(subs); renderSubscriptions(); showAlert('subsAlert','Subscription cancelled','success'); }
+
+    function processDueSubscriptions(){ const subs = loadSubs(); const allPhones = Object.keys(subs); const today = new Date(); let changed=false; for(const phone of allPhones){ const arr = subs[phone]; for(const s of arr){ const next = new Date(s.nextDate + 'T00:00:00'); if(next <= today){ // attempt payment
+                    const u = users[phone]; if(!u) continue; if(u.balance >= s.amount){ u.balance -= s.amount; const ts = new Date().toISOString(); u.transactions.push({id:Date.now(),type:'debit',amount:s.amount,desc:`Subscription ${s.service}`,date:ts,balance:u.balance}); // advance next by one month
+                            const nd = new Date(next); nd.setMonth(nd.getMonth()+1); s.nextDate = nd.toISOString().slice(0,10); changed=true; saveUsers(); }
+                }
+            }
+        }
+        if(changed) saveSubs(subs);
+    }
+
+    // --- Invoices (local demo + backend-aware) ---
+    function loadInvoices(){ try{ const v = JSON.parse(localStorage.getItem(INVOICES_KEY) || '[]'); window._invoices = Array.isArray(v)?v:[]; }catch(e){ window._invoices = []; } renderInvoices(); }
+    function saveInvoices(){ localStorage.setItem(INVOICES_KEY, JSON.stringify(window._invoices || [])); }
+
+    async function createInvoice(){ if(!currentUser) return showAlert('invoiceAlert','Login to create invoice','error'); const merchant = document.getElementById('invMerchant').value.trim() || users[currentUser].name || users[currentUser].walletId; const amount = parseFloat(document.getElementById('invAmount').value); const desc = document.getElementById('invDesc').value.trim() || 'Invoice'; if(!amount||amount<=0) return showAlert('invoiceAlert','Enter valid amount','error'); const token = localStorage.getItem('x-auth-token') || localStorage.getItem('unipay_token'); if(token){ try{ const resp = await fetch('/api/invoice',{ method:'POST', headers:{ 'Content-Type':'application/json','x-auth-token': token }, body: JSON.stringify({ merchant, amount, description: desc }) }); const data = await resp.json(); if(resp.ok && data && data.success){ showAlert('invoiceAlert','Invoice created','success'); renderInvoices(); return; } return showAlert('invoiceAlert', data.message || 'Failed to create invoice','error'); }catch(e){ console.error('Create invoice error',e); return showAlert('invoiceAlert','Server error','error'); } }
+        // local demo: create invoice object
+        const inv = { id: 'inv_' + Date.now().toString(36), merchant, amount, description: desc, createdBy: currentUser, createdAt: new Date().toISOString(), status: 'pending', payer: null };
+        window._invoices = window._invoices || []; window._invoices.push(inv); saveInvoices(); renderInvoices(); showAlert('invoiceAlert','Invoice created (local)','success'); document.getElementById('invMerchant').value=''; document.getElementById('invAmount').value=''; document.getElementById('invDesc').value=''; }
+
+    function renderInvoices(){ const container = document.getElementById('invoicesList'); if(!container) return; const list = (window._invoices||[]).slice().reverse(); if(list.length===0){ container.innerHTML = '<p style="text-align:center;color:#999;padding:12px 0;">No invoices</p>'; return; } container.innerHTML = list.map(inv=>{ const paid = inv.status==='paid' || inv.paidAt; const payer = inv.payer||'-'; return `<div style="padding:10px;border-bottom:1px solid #eee"><div style="display:flex;justify-content:space-between"><div><strong>${inv.merchant}</strong><div style="font-size:13px;color:#666">${inv.description}</div></div><div style="text-align:right">₹${Number(inv.amount).toFixed(2)}<div style="font-size:12px;color:${paid? '#4caf50':'#f57c00'}">${paid? 'Paid':'Pending'}</div></div></div><div style="margin-top:8px;display:flex;gap:8px"><div style="flex:1;color:#666;font-size:12px">Invoice ID: ${inv.id} • Created: ${new Date(inv.createdAt).toLocaleString()}</div>${paid?`<div style="font-size:12px;color:#333">Paid by ${payer}</div>`:`<div><button class="btn btn-primary" onclick="payInvoice('${inv.id}')">Pay</button></div>`}</div></div>`; }).join(''); }
+
+    async function payInvoice(id){ if(!currentUser) return showAlert('invoiceAlert','Login to pay invoice','error'); const inv = (window._invoices||[]).find(i=>i.id===id); if(!inv) return showAlert('invoiceAlert','Invoice not found','error'); if(inv.status==='paid') return showAlert('invoiceAlert','Already paid','success'); const amount = Number(inv.amount); const token = localStorage.getItem('x-auth-token') || localStorage.getItem('unipay_token'); const pin = prompt('Enter your 4-digit PIN to authorize payment'); if(!pin) return showAlert('invoiceAlert','PIN required','error');
+        if(token){ try{ const resp = await fetch('/api/invoice/' + encodeURIComponent(id) + '/pay', { method:'POST', headers:{ 'Content-Type':'application/json','x-auth-token': token }, body: JSON.stringify({ pin }) }); const data = await resp.json(); if(resp.ok && data && data.success){ showAlert('invoiceAlert','Invoice paid','success'); inv.status='paid'; inv.payer='you'; inv.paidAt=new Date().toISOString(); saveInvoices(); renderInvoices(); return; } return showAlert('invoiceAlert', data.message || 'Failed to pay invoice','error'); }catch(e){ console.error('Pay invoice error', e); return showAlert('invoiceAlert','Server error','error'); } }
+
+        // Local demo payment flow
+        const sender = users[currentUser]; if(!sender) return showAlert('invoiceAlert','Sender not found','error'); if(pin!==sender.pin) return showAlert('invoiceAlert','Incorrect PIN','error'); if(sender.balance < amount) return showAlert('invoiceAlert','Insufficient balance','error'); sender.balance -= amount; const ts = new Date().toISOString(); sender.transactions.push({ id: Date.now(), type: 'debit', amount, desc: `Invoice ${inv.id} to ${inv.merchant}`, date: ts, balance: sender.balance }); const merchantUser = Object.values(users).find(u=>u.name===inv.merchant || u.walletId===inv.merchant); if(merchantUser){ merchantUser.balance = (merchantUser.balance||0) + amount; merchantUser.transactions.push({ id: Date.now()+1, type: 'credit', amount, desc: `Invoice ${inv.id} paid`, date: ts, balance: merchantUser.balance }); }
+        inv.status = 'paid'; inv.payer = currentUser; inv.paidAt = ts; saveUsers(); saveInvoices(); renderInvoices(); updateDashboard(); updateTransactions(); showAlert('invoiceAlert',`Paid ₹${amount.toFixed(2)} for invoice ${inv.id}`,'success'); }
+
+    // expose invoice functions
+    window.createInvoice = createInvoice; window.renderInvoices = renderInvoices; window.payInvoice = payInvoice;
+
+    // --- Contacts & Favorites (local) ---
+    const FAVS_KEY = 'unipay_favs_v1';
+    function loadFavs(){ try{ return JSON.parse(localStorage.getItem(FAVS_KEY) || '[]'); }catch(e){ return []; } }
+    function saveFavs(arr){ localStorage.setItem(FAVS_KEY, JSON.stringify(arr || [])); }
+
+    function renderFavorites(){ const container = document.getElementById('favoritesContainer'); if(!container) return; const favs = loadFavs(); if(favs.length===0){ container.innerHTML = '<div style="color:#999">No favorites yet</div>'; return; } container.innerHTML = favs.map(f=>`<button class="btn" style="background:#fff;color:#333;padding:8px 10px;border-radius:10px" onclick="selectRecipient('${f.value}')">${f.label}</button>`).join(''); }
+
+    function addFavoriteFromForm(){ const recip = (document.getElementById('recipient').value||'').trim(); if(!recip) return showAlert('sendAlert','Enter recipient first','error'); const label = prompt('Label for this frequent recipient (e.g. Dad, Rent):', recip) || recip; const favs = loadFavs(); // avoid duplicates
+        if(favs.find(x=>x.value===recip)) return showAlert('sendAlert','Already in favorites','error'); favs.push({ label, value: recip }); saveFavs(favs); renderFavorites(); showAlert('sendAlert','Added to frequent recipients','success'); }
+
+    function openFavoritesManager(){ const favs = loadFavs(); if(favs.length===0) return alert('No frequent recipients to manage'); const list = favs.map((f,i)=>`${i+1}. ${f.label} — ${f.value}`).join('\n'); const idx = prompt(`Favorites:\n${list}\n\nEnter number to remove (or Cancel):`); if(!idx) return; const num = parseInt(idx); if(isNaN(num) || num<1 || num>favs.length) return alert('Invalid selection'); favs.splice(num-1,1); saveFavs(favs); renderFavorites(); showAlert('sendAlert','Favorite removed','success'); }
+
+    function selectRecipient(val){ document.getElementById('recipient').value = val; // update pay via UPI visibility
+        const update = new Event('input'); document.getElementById('recipient').dispatchEvent(update); }
+
+    function renderContacts(){ const container = document.getElementById('contactsContainer'); if(!container) return; const current = currentUser; const all = Object.values(users || {}); const others = all.filter(u=>u.phone!==current); if(others.length===0){ container.innerHTML = '<div style="color:#999">No contacts yet</div>'; return; } container.innerHTML = others.map(o=>`<button class="btn" style="background:#fff;color:#333;padding:8px 10px;border-radius:10px" onclick="selectRecipient('${o.phone}')">${o.name || o.phone} (${o.phone})</button>`).join(''); }
+
+    // --- Init ---
+    loadUsers(); // ensure users available
+    loadInvoices();
+    // process subscriptions at startup and every minute
+    processDueSubscriptions();
+    setInterval(processDueSubscriptions, 60*1000);
+
+    // Send Money implementation
+    async function sendMoney(){
+        if(!currentUser) return showAlert('sendAlert','Login first','error');
+        const recipientRaw = document.getElementById('recipient').value.trim();
+        const amount = parseFloat(document.getElementById('sendAmount').value);
+        const pin = document.getElementById('sendPin').value.trim();
+        if(!recipientRaw || !amount || !pin) return showAlert('sendAlert','Please fill all fields','error');
+        const sender = users[currentUser];
+        if(pin !== sender.pin) return showAlert('sendAlert','Incorrect PIN','error');
+        if(amount <= 0 || amount > sender.balance) return showAlert('sendAlert','Invalid or insufficient amount','error');
+
+        // Normalize recipient: accept +91, spaces, dashes, or walletId
+        const raw = String(recipientRaw || '').trim();
+        const walletCandidate = raw.toUpperCase();
+        const digits = raw.replace(/\D/g, '');
+        let phoneCandidate = digits;
+        if (digits.length > 10) phoneCandidate = digits.slice(-10);
+
+        // If an auth token is present, prefer calling backend API
+        const token = localStorage.getItem('x-auth-token') || localStorage.getItem('unipay_token');
+        if (token) {
+            try {
+                const idemp = 'web-' + Date.now();
+                const resp = await fetch('/api/wallet/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-auth-token': token
+                    },
+                    body: JSON.stringify({ recipient: recipientRaw, amount, pin, idempotencyKey: idemp })
+                });
+                const data = await resp.json();
+                if (!resp.ok) {
+                    // if recipient not found on server, offer UPI fallback
+                    if (data && /recipient not found/i.test(data.message || '')){
+                        const tryUpi = confirm('Recipient not registered on UniPay. Would you like to pay via UPI (enter VPA)?');
+                        if(tryUpi){
+                            const vpa = prompt('Enter payee VPA (e.g. merchant@bank)');
+                            if(vpa){ openUPIPay(vpa, amount, `Payment to ${vpa}`); return; }
+                        }
+                    }
+                    return showAlert('sendAlert', data.message || 'Send failed', 'error');
+                }
+                if (data && data.success) {
+                    // Refresh balance from backend
+                    try {
+                        const balResp = await fetch('/api/wallet/balance', { headers: { 'x-auth-token': token } });
+                        if (balResp.ok) {
+                            const b = await balResp.json();
+                            if (b && b.success) {
+                                // update local demo state if present
+                                if (users[currentUser]) { users[currentUser].balance = b.balance; saveUsers(); }
+                                updateDashboard(); updateTransactions();
+                            }
+                        }
+                    }catch(e){}
+                    showAlert('sendAlert', data.message || `₹${amount.toFixed(2)} sent`, 'success');
+                    document.getElementById('recipient').value=''; document.getElementById('sendAmount').value=''; document.getElementById('sendPin').value='';
+                    return;
+                }
+                return showAlert('sendAlert', data.message || 'Send failed', 'error');
+            } catch (err) {
+                console.error('Backend send error', err);
+                return showAlert('sendAlert','Server error during send','error');
+            }
+        }
+
+        // Local demo fallback (normalize and match against demo users)
+        const recipientUser = users[phoneCandidate] || Object.values(users).find(u=>u.walletId===walletCandidate || u.walletId===recipientRaw);
+        if(!recipientUser){
+            // if recipient looks like a VPA (contains '@'), offer UPI direct payment
+            if(recipientRaw.includes('@')){
+                const ok = confirm('Recipient not a UniPay user. Pay via UPI to this VPA instead?');
+                if(ok){ openUPIPay(recipientRaw, amount, `Payment to ${recipientRaw}`); return; }
+            }
+            // otherwise ask if user wants to enter a VPA to pay externally
+            const tryUpi = confirm('Recipient not found. Would you like to pay via UPI by entering the payee VPA?');
+            if(tryUpi){
+                const vpa = prompt('Enter payee VPA (e.g. merchant@bank)');
+                if(vpa){ openUPIPay(vpa, amount, `Payment to ${vpa}`); return; }
+            }
+            return showAlert('sendAlert','Recipient not found','error');
+        }
+        sender.balance -= amount;
+        recipientUser.balance = (recipientUser.balance||0) + amount;
+        const ts = new Date().toISOString();
+        sender.transactions.push({id:Date.now(), type:'debit', amount, desc:`Sent to ${recipientUser.name||recipientRaw}`, date:ts, balance:sender.balance});
+        recipientUser.transactions.push({id:Date.now()+1, type:'credit', amount, desc:`Received from ${sender.name||currentUser}`, date:ts, balance:recipientUser.balance});
+        saveUsers(); updateDashboard(); updateTransactions(); showAlert('sendAlert',`₹${amount.toFixed(2)} sent to ${recipientUser.name||recipientRaw}`,'success');
+        document.getElementById('recipient').value=''; document.getElementById('sendAmount').value=''; document.getElementById('sendPin').value='';
+    }
+
+    // Open UPI deep link to initiate payment in user's UPI app
+    function openUPIPay(vpa, amount, note){
+        const pa = String(vpa || '').trim();
+        if(!pa) return showAlert('sendAlert','Invalid VPA','error');
+        const params = [];
+        params.push('pa=' + encodeURIComponent(pa));
+        params.push('pn=' + encodeURIComponent('UniPay Receiver'));
+        if(amount) params.push('am=' + encodeURIComponent(Number(amount).toFixed(2)));
+        params.push('cu=INR');
+        if(note) params.push('tn=' + encodeURIComponent(note));
+        const upiUrl = 'upi://pay?' + params.join('&');
+
+        // Try to open via window.location, fallback to copying the link
+        try{
+            window.location.href = upiUrl;
+            setTimeout(()=>{
+                const choose = confirm('If your UPI app did not open, click OK to copy the UPI link so you can open it manually.');
+                if(choose){ navigator.clipboard && navigator.clipboard.writeText(upiUrl); showAlert('sendAlert','UPI link copied to clipboard. Open it in your phone to pay.','success'); }
+            },800);
+        }catch(e){
+            try{ navigator.clipboard && navigator.clipboard.writeText(upiUrl); showAlert('sendAlert','UPI link copied to clipboard. Open it in your phone to pay.','success'); }
+            catch(_){ showAlert('sendAlert','Unable to open UPI app automatically. Please copy the UPI link manually.','error'); }
+        }
+    }
+
+    // Expose small functions to global scope used by onclick attributes
+    window.showPage = showPage; window.showTab = showTab; window.register = register; window.login = login; window.logout = logout; window.sendMoney = sendMoney; window.topUp = topUpFallback;
+
+    // If recipient field contains a VPA (contains '@'), show the Pay via UPI button
+    const recipientInput = document.getElementById('recipient');
+    const payViaBtn = document.getElementById('payViaUpiBtn');
+    if(recipientInput && payViaBtn){
+        const updatePayBtn = ()=>{
+            const val = String(recipientInput.value||'').trim();
+            if(val.includes('@')) payViaBtn.style.display = 'inline-block'; else payViaBtn.style.display = 'none';
+        };
+        recipientInput.addEventListener('input', updatePayBtn);
+        // initialize
+        updatePayBtn();
+    }
+
+    // Handler to pay via UPI from the send form (for external VPAs)
+    async function payViaUPIFromForm(){
+        if(!currentUser) return showAlert('sendAlert','Login first','error');
+        const pa = String(document.getElementById('recipient').value||'').trim();
+        if(!pa || !pa.includes('@')) return showAlert('sendAlert','Enter a valid VPA','error');
+        let amount = parseFloat(document.getElementById('sendAmount').value);
+        if(!amount || isNaN(amount) || amount<=0){
+            const input = prompt('Enter amount to pay via UPI:');
+            if(!input) return showAlert('sendAlert','Amount required','error');
+            const parsed = parseFloat(input);
+            if(isNaN(parsed) || parsed<=0) return showAlert('sendAlert','Invalid amount','error');
+            amount = parsed;
+        }
+        const ok = confirm(`Open your UPI app to pay ₹${amount.toFixed(2)} to ${pa}?`);
+        if(!ok) return showAlert('sendAlert','Payment cancelled','error');
+        // attempt to open UPI deep link; openUPIPay will fallback to copying the link
+        openUPIPay(pa, amount, `Payment to ${pa}`);
+    }
+
+    // expose the new handler
+    window.payViaUPIFromForm = payViaUPIFromForm;
+
+    // small compatibility topUp used earlier
+    function topUpFallback(){ const code = document.getElementById('voucherCode').value.trim().toUpperCase(); const vouchers = { 'UNIPAY100':100,'UNIPAY500':500,'UNIPAY1000':1000,'UNIPAY5000':5000 }; if(!currentUser) return showAlert('topupAlert','Please login','error'); if(!code) return showAlert('topupAlert','Enter voucher code','error'); const amount = vouchers[code]; if(!amount) return showAlert('topupAlert','Invalid voucher code','error'); users[currentUser].balance += amount; users[currentUser].transactions.push({id:Date.now(),type:'credit',amount,desc:'Voucher Top-up',date:new Date().toISOString(),balance:users[currentUser].balance}); saveUsers(); updateDashboard(); updateTransactions(); showAlert('topupAlert',`₹${amount} added`,'success'); document.getElementById('voucherCode').value=''; }
+
+    // Make sure UI shows login page initially
+    showPage('loginPage');
+    
+    // Ensure demo contact 'Sania' exists and is in favorites so user can pay her quickly
+    (function ensureSania(){
+        try{
+            const phone = '9000000001'; // demo phone for Sania
+            if(!users[phone]){
+                users[phone] = { phone: phone, name: 'Sania', pin: '0000', walletId: 'W' + (Date.now().toString().slice(-6)), balance: 0, transactions: [] };
+                saveUsers();
+            }
+            // add to favorites if not already present
+            const favs = loadFavs();
+            if(!favs.find(f => f.value === phone || (f.label && f.label.toLowerCase() === 'sania'))){
+                favs.push({ label: 'Sania', value: phone });
+                saveFavs(favs);
+            }
+            renderFavorites();
+            renderContacts();
+            console.log('Demo contact Sania ensured (phone: ' + phone + ')');
+        }catch(e){ console.error('Error ensuring Sania contact', e); }
+    })();
+    </script>
+
+
+</body>
+</html>
+

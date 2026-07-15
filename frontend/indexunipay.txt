@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniPay - Digital Wallet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-circle {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }.btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .link-btn {
+            text-align: center;
+            margin-top: 15px;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .link-btn:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+        }
+
+        .alert-success {
+            background: #efe;
+            border: 1px solid #cfc;
+            color: #3c3;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .balance-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .balance-amount {
+            font-size: 42px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .balance-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .action-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .action-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }.transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 15px;
+        }
+
+        .transaction-credit .transaction-icon {
+            background: #e8f5e9;
+            color: #4caf50;
+        }
+
+        .transaction-debit .transaction-icon {
+            background: #ffebee;
+            color: #f44336;
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .transaction-amount {
+            text-align: right;
+        }
+
+        .transaction-credit .amount {
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .transaction-debit .amount {
+            color: #f44336;
+            font-weight: bold;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            color: #999;
+            transition: all 0.3s;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+        }
+
+        .header {
+            background: white;
+            padding: 15px 20px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }.logout-btn {
+            color: #f44336;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            text-decoration: underline;
+        }
+
+        .demo-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #1976d2;
+        }
+
+        .voucher-list {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .voucher-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+
+        .voucher-code {
+            font-family: monospace;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+
+        .profile-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-row:last-child {
+            border-bottom: none;
+        }
+
+        .profile-label {
+            color: #666;
+        }
+
+        .profile-value {
+            font-weight: 600;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Page -->
+        <div id="loginPage" class="page active">
+            <div class="card">
+                <div class="logo">
+                    <div class="logo-circle">💰</div>
+                    <h1>UniPay</h1>
+                    <p class="subtitle">Bank-Free Digital Wallet</p>
+                </div>
+
+                <div id="loginAlert"></div>
+
+                <div class="input-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="loginPhone" placeholder="Enter phone number" maxlength="10">
+                </div>
+
+                <div class="input-group">
+                    <label>PIN</label>
+                    <input type="password" id="loginPin" placeholder="Enter 4-digit PIN" maxlength="4">
+                </div>
+
+                <button class="btn btn-primary" onclick="login()">Login</button>
+
+                <div class="link-btn" onclick="showPage('registerPage')">
+                    Don't have an account? Register
+                </div>
+
+                <div class="demo-info">
+                    <strong>Demo Account:</strong><br>
+                    Phone: 9876543210<br>
+                    PIN: 1234
+                </div>
+            </div>
+        </div>
+
+        <!-- Register Page -->
+        <div id="registerPage" class="page">
+            <div class="card">
+                <h2>Create Account</h2>
+
+                <div id="registerAlert"></div>
+
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="regName" placeholder="Enter your name">
+                </div>
+
+                <div class="input-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="regPhone" placeholder="10-digit phone number" maxlength="10">
+                </div>
+
+                <div class="input-group">
+                    <label>Create PIN</label>
+                    <input type="password" id="regPin" placeholder="4-digit PIN" maxlength="4">
+                </div><div class="input-group">
+                    <label>Confirm PIN</label>
+                    <input type="password" id="regConfirmPin" placeholder="Re-enter PIN" maxlength="4">
+                </div>
+
+                <button class="btn btn-primary" onclick="register()">Register</button>
+
+                <div class="link-btn" onclick="showPage('loginPage')">
+                    Already have an account? Login
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboardPage" class="page">
+            <!-- Home Tab -->
+            <div id="homeTab" class="tab-content">
+                <div class="balance-card">
+                    <div class="balance-label">Total Balance</div>
+                    <div class="balance-amount" id="balanceAmount">₹0.00</div>
+                    <div class="balance-info">
+                        <span id="walletIdDisplay">Wallet ID: -</span>
+                        <span id="phoneDisplay">-</span>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <div class="action-card" onclick="showTab('sendTab')">
+                        <div class="action-icon">💸</div>
+                        <div>Send Money</div>
+                    </div>
+                    <div class="action-card" onclick="showTab('topupTab')">
+                        <div class="action-icon">📥</div>
+                        <div>Top Up</div>
+                    </div>
+                    <div class="action-card" onclick="showTab('qrTab')">
+                        <div class="action-icon">📱</div>
+                        <div>Scan QR</div>
+                    </div>
+                    <div class="action-card" onclick="showTab('billsTab')">
+                        <div class="action-icon">🧾</div>
+                        <div>Pay Bills</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Recent Transactions</h2>
+                    <div id="recentTransactions">
+                        <p style="text-align: center; color: #999; padding: 20px 0;">No transactions yet</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Send Tab -->
+            <div id="sendTab" class="tab-content" style="display: none;">
+                <div class="card">
+                    <div class="header">
+                        <div class="header-title">
+                            <span>💸</span> Send Money
+                        </div>
+                        <div class="logout-btn" onclick="logout()">Logout</div>
+                    </div>
+
+                    <div id="sendAlert"></div>
+
+                    <div class="input-group">
+                        <label>Recipient (Phone/Wallet ID)</label>
+                        <input type="text" id="recipient" placeholder="Enter phone or wallet ID">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Amount (₹)</label>
+                        <input type="number" id="sendAmount" placeholder="0.00">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Enter PIN</label>
+                        <input type="password" id="sendPin" placeholder="4-digit PIN" maxlength="4">
+                    </div>
+
+                    <div class="demo-info" style="margin-top: 0;">
+                        <strong>Available Balance:</strong> ₹<span id="availableBalance">0.00</span>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="sendMoney()">Send Money</button>
+                </div>
+            </div><!-- Top Up Tab -->
+            <div id="topupTab" class="tab-content" style="display: none;">
+                <div class="card">
+                    <div class="header">
+                        <div class="header-title">
+                            <span>📥</span> Top Up Wallet
+                        </div>
+                        <div class="logout-btn" onclick="logout()">Logout</div>
+                    </div>
+
+                    <div id="topupAlert"></div>
+
+                    <div class="input-group">
+                        <label>Voucher Code</label>
+                        <input type="text" id="voucherCode" placeholder="Enter voucher code" style="text-transform: uppercase;">
+                    </div><button class="btn btn-primary" onclick="topUp()">Add to Wallet</button>
+
+                    <div class="voucher-list">
+                        <h3 style="margin-bottom: 10px; color: #333;">Demo Voucher Codes:</h3>
+                        <div class="voucher-item">
+                            <span class="voucher-code">UNIPAY100</span>
+                            <span>₹100</span>
+                        </div>
+                        <div class="voucher-item">
+                            <span class="voucher-code">UNIPAY500</span>
+                            <span>₹500</span>
+                        </div>
+                        <div class="voucher-item">
+                            <span class="voucher-code">UNIPAY1000</span>
+                            <span>₹1,000</span>
+                        </div>
+                        <div class="voucher-item">
+                            <span class="voucher-code">UNIPAY5000</span>
+                            <span>₹5,000</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bills Tab -->
+            <div id="billsTab" class="tab-content" style="display: none;">
+                <div class="card">
+                    <div class="header">
+                        <div class="header-title">🧾 Pay Bills</div>
+                        <div class="logout-btn" onclick="logout()">Logout</div>
+                    </div>
+
+                    <div id="billsAlert"></div>
+
+                    <div class="input-group">
+                        <label>Select Bill Type</label>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                            <button class="btn" style="background:#fff;color:#333;" onclick="prepareBill('electricity')">Electricity</button>
+                            <button class="btn" style="background:#fff;color:#333;" onclick="prepareBill('water')">Water</button>
+                            <button class="btn" style="background:#fff;color:#333;" onclick="prepareBill('mobile')">Mobile Recharge</button>
+                            <button class="btn" style="background:#fff;color:#333;" onclick="prepareBill('dth')">DTH Recharge</button>
+                            <button class="btn" style="background:#fff;color:#333;grid-column:span 2;" onclick="prepareBill('dmrc')">DMRC Metro Card Recharge</button>
+                        </div>
+                    </div>
+
+                    <div id="billForm" style="display:none; margin-top:10px">
+                        <div class="input-group">
+                            <label id="billLabel">Account / Number</label>
+                            <input type="text" id="billAccount" placeholder="Account or Phone">
+                        </div>
+                        <div class="input-group">
+                            <label>Amount (₹)</label>
+                            <input type="number" id="billAmount" placeholder="0.00">
+                        </div>
+                        <div class="input-group">
+                            <label>Enter PIN</label>
+                            <input type="password" id="billPin" placeholder="4-digit PIN" maxlength="4">
+                        </div>
+                        <button class="btn btn-primary" onclick="payBill()">Pay Bill</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QR Tab -->
+            <div id="qrTab" class="tab-content" style="display: none;">
+                <div class="card">
+                    <div class="header">
+                        <div class="header-title">📱 Scan QR</div>
+                        <div class="logout-btn" onclick="logout()">Logout</div>
+                    </div>
+
+                    <div id="qrAlert"></div>
+
+                    <div style="margin-bottom:10px">
+                        <button class="btn btn-primary" onclick="startQRScan()">Start Camera Scan</button>
+                    </div>
+
+                    <div style="margin-bottom:10px">
+                        <label>Or paste QR payload</label>
+                        <input type="text" id="qrPaste" placeholder="e.g. pay:9876543210:100 or service:electricity:account:100">
+                        <button class="btn" style="margin-top:8px;background:#fff;color:#333;" onclick="processQRPaste()">Use Payload</button>
+                    </div>
+
+                    <div id="qrVideoContainer" style="display:none;">
+                        <video id="qrVideo" autoplay muted playsinline style="width:100%;border-radius:12px"></video>
+                        <button class="btn" style="margin-top:8px;background:#fff;color:#333;" onclick="stopQRScan()">Stop Scan</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div id="historyTab" class="tab-content" style="display: none;">
+                <div class="card">
+                    <div class="header">
+                        <div class="header-title">
+                            <span>📜</span> Transaction History
+                        </div>
+                        <div class="logout-btn" onclick="logout()">Logout</div>
+                    </div>
+                    <div id="allTransactions">
+                        <p style="text-align: center; color: #999; padding: 20px 0;">No transactions yet</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="profileTab" class="tab-content" style="display: none;">
+                <div class="card">
+                    <div class="header">
+                        <div class="header-title">
+                            <span>👤</span> Profile
+                        </div>
+                        <div class="logout-btn" onclick="logout()">Logout</div>
+                    </div>
+
+                    <div class="profile-avatar" id="profileAvatar">J</div>
+
+                    <div class="profile-row">
+                        <span class="profile-label">Name</span>
+                        <span class="profile-value" id="profileName">-</span>
+                    </div>
+                    <div class="profile-row">
+                        <span class="profile-label">Phone Number</span>
+                        <span class="profile-value" id="profilePhone">-</span>
+                    </div>
+                    <div class="profile-row">
+                        <span class="profile-label">Wallet ID</span>
+                        <span class="profile-value" id="profileWalletId">-</span>
+                    </div>
+                    <div class="profile-row">
+                        <span class="profile-label">Current Balance</span>
+                        <span class="profile-value" id="profileBalance">₹0.00</span>
+                    </div>
+                    <div class="profile-row">
+                        <span class="profile-label">Total Transactions</span>
+                        <span class="profile-value" id="profileTransactions">0</span>
+                    </div>
+
+                    <div class="demo-info" style="margin-top: 20px;">
+                        <strong>🛡️ Security</strong><br>
+                        Your account is protected with PIN authentication
+                    </div>
+                    
+                    <div style="margin-top:20px">
+                        <h3>Your QR</h3>
+                        <div id="personalQrContainer" style="text-align:center;margin-bottom:10px">
+                            <canvas id="personalQrCanvas" style="max-width:200px;display:none"></canvas>
+                            <img id="personalQrImg" alt="Your QR" style="max-width:200px;display:none;border-radius:12px" />
+                        </div>
+                        <button class="btn" onclick="generatePersonalQR()">Show My QR</button>
+                    </div>
+
+                    <div style="margin-top:20px">
+                        <h3>Subscriptions</h3>
+                        <div id="subsAlert"></div>
+                        <div class="input-group">
+                            <label>Service</label>
+                            <select id="subService">
+                                <option value="netflix">Netflix</option>
+                                <option value="spotify">Spotify</option>
+                                <option value="prime">Prime Video</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Payee (phone/account)</label>
+                            <input type="text" id="subPayee" placeholder="e.g. 9876543210 or account id">
+                        </div>
+                        <div class="input-group">
+                            <label>Amount (₹)</label>
+                            <input type="number" id="subAmount" placeholder="0.00">
+                        </div>
+                        <div class="input-group">
+                            <label>Next Payment Date</label>
+                            <input type="date" id="subNextDate">
+                        </div>
+                        <div class="input-group">
+                            <label>Frequency</label>
+                            <select id="subFreq">
+                                <option value="monthly">Monthly</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="createSubscription()">Create Subscription</button>
+
+                        <div style="margin-top:15px">
+                            <h4>Active Subscriptions</h4>
+                            <div id="subsList">No subscriptions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- Bottom Navigation -->
+    <div id="bottomNav" class="bottom-nav" style="display: none;">
+        <div class="nav-item active" onclick="showTab('homeTab')">
+            <div class="nav-icon">🏠</div>
+            <div class="nav-label">Home</div>
+        </div>
+        <div class="nav-item" onclick="showTab('sendTab')">
+            <div class="nav-icon">💸</div>
+            <div class="nav-label">Send</div>
+        </div>
+        <div class="nav-item" onclick="showTab('topupTab')">
+            <div class="nav-icon">📥</div>
+            <div class="nav-label">Top Up</div>
+        </div>
+        <div class="nav-item" onclick="showTab('historyTab')">
+            <div class="nav-icon">📜</div>
+            <div class="nav-label">History</div>
+        </div>
+        <div class="nav-item" onclick="showTab('profileTab')">
+            <div class="nav-icon">👤</div>
+            <div class="nav-label">Profile</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <script>
+    // --- Storage keys ---
+    const USERS_KEY = 'unipay_users_v1';
+    const SUBS_KEY = 'unipay_subs_v1';
+
+    let users = {};
+    let currentUser = null; // phone string
+
+    // --- Persistence ---
+    function loadUsers(){
+        try{ users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}'); }catch(e){ users = {}; }
+        if(Object.keys(users).length===0) initDemoData();
+    }
+    function saveUsers(){ localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
+
+    function loadSubs(){
+        try{return JSON.parse(localStorage.getItem(SUBS_KEY) || '{}');}catch(e){return {};}
+    }
+    function saveSubs(s){ localStorage.setItem(SUBS_KEY, JSON.stringify(s)); }
+
+    // --- Demo data ---
+    function initDemoData(){
+        users = {
+            '9876543210': {
+                phone: '9876543210',
+                name: 'Demo User',
+                pin: '1234',
+                walletId: 'W' + Date.now().toString().slice(-6),
+                balance: 1000,
+                transactions: []
+            }
+        };
+        saveUsers();
+    }
+
+    // --- Navigation ---
+    function showPage(pageId){
+        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+        const el = document.getElementById(pageId);
+        if(el) el.classList.add('active');
+        // show/hide bottom nav
+        document.getElementById('bottomNav').style.display = (pageId==='dashboardPage' && currentUser)?'flex':'none';
+    }
+
+    function showTab(tabId){
+        document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
+        const el = document.getElementById(tabId);
+        if(el) el.style.display='block';
+        if(tabId==='homeTab' || tabId==='historyTab') updateTransactions();
+        if(tabId==='profileTab') updateProfile();
+        if(tabId==='sendTab' && currentUser){ document.getElementById('availableBalance').textContent = (users[currentUser].balance||0).toFixed(2); }
+    }
+
+    // --- Alerts ---
+    function showAlert(id,msg,type){
+        const el = document.getElementById(id); if(!el) return;
+        el.innerHTML = `<div class="alert ${type==='error'?'alert-error':'alert-success'}">${msg}</div>`;
+        setTimeout(()=>{ if(el) el.innerHTML=''; },3500);
+    }
+
+    // --- Auth ---
+    function register(){
+        const name = document.getElementById('regName').value.trim();
+        const phone = document.getElementById('regPhone').value.trim();
+        const pin = document.getElementById('regPin').value.trim();
+        const confirmPin = document.getElementById('regConfirmPin').value.trim();
+        if(!name||phone.length!==10||pin.length!==4||pin!==confirmPin){ showAlert('registerAlert','Please fill correctly','error'); return; }
+        if(users[phone]){ showAlert('registerAlert','Phone already registered','error'); return; }
+        users[phone] = {name, phone, pin, walletId:'W'+Math.floor(Math.random()*900000+100000), balance:0, transactions:[]};
+        saveUsers();
+        showAlert('registerAlert','Account created — please login','success');
+        setTimeout(()=>showPage('loginPage'),1000);
+    }
+
+    function login(){
+        loadUsers();
+        const phone = document.getElementById('loginPhone').value.trim();
+        const pin = document.getElementById('loginPin').value.trim();
+        if(phone.length!==10||pin.length===0){ showAlert('loginAlert','Enter phone & PIN','error'); return; }
+        const user = users[phone];
+        if(!user||user.pin!==pin){ showAlert('loginAlert','Invalid phone or PIN','error'); return; }
+        currentUser = phone;
+        showPage('dashboardPage');
+        showTab('homeTab');
+        updateDashboard(); updateTransactions(); updateProfile(); renderSubscriptions();
+    }
+
+    function logout(){ currentUser=null; showPage('loginPage'); showAlert('loginAlert','Logged out','success'); }
+
+    // --- Dashboard / Profile ---
+    function updateDashboard(){ if(!currentUser) return; const u = users[currentUser]; document.getElementById('balanceAmount').textContent = '₹'+(u.balance||0).toFixed(2); document.getElementById('walletIdDisplay').textContent = 'Wallet ID: '+(u.walletId||'-'); document.getElementById('phoneDisplay').textContent = u.phone; }
+
+    function updateProfile(){ if(!currentUser) return; const u = users[currentUser]; document.getElementById('profileName').textContent = u.name; document.getElementById('profilePhone').textContent = u.phone; document.getElementById('profileWalletId').textContent = u.walletId; document.getElementById('profileBalance').textContent = '₹'+(u.balance||0).toFixed(2); document.getElementById('profileTransactions').textContent = u.transactions.length; document.getElementById('profileAvatar').textContent = (u.name||'U').charAt(0).toUpperCase(); }
+
+    // --- Transactions UI ---
+    function updateTransactions(){ if(!currentUser) return; const u = users[currentUser]; const recentDiv = document.getElementById('recentTransactions'); const allDiv = document.getElementById('allTransactions'); const tx = (u.transactions||[]).slice().reverse(); if(tx.length===0){ recentDiv.innerHTML = allDiv.innerHTML = '<p style="text-align:center;color:#999;padding:20px 0;">No transactions yet</p>'; return; } const html = tx.map(t=>`<div class="transaction-item transaction-${t.type}"><div class="transaction-icon">${t.type==='credit'?'⬆️':'⬇️'}</div><div class="transaction-details"><div class="transaction-title">${t.desc}</div><div class="transaction-date">${new Date(t.date).toLocaleString()}</div></div><div class="transaction-amount">${t.type==='credit'?'+':'-'}₹${t.amount.toFixed(2)}</div></div>`).join(''); recentDiv.innerHTML = html.split('</div>').slice(0,6).join('</div>'); allDiv.innerHTML = html; }
+
+    // --- Pay Bills / Services ---
+    let currentBillService = null;
+    function prepareBill(service){ currentBillService = service; document.getElementById('billForm').style.display='block'; const label = {electricity:'Consumer / Account No', water:'Connection / Account', mobile:'Mobile Number', dth:'Subscriber ID', dmrc:'Metro Card No'}[service]||'Account'; document.getElementById('billLabel').textContent = label; }
+
+    function payBill(){ if(!currentUser) return; const acct = document.getElementById('billAccount').value.trim(); const amount = parseFloat(document.getElementById('billAmount').value); const pin = document.getElementById('billPin').value.trim(); if(!acct||!amount||!pin){ showAlert('billsAlert','Fill all fields','error'); return; } const u = users[currentUser]; if(pin!==u.pin){ showAlert('billsAlert','Incorrect PIN','error'); return; } if(amount<=0||amount>u.balance){ showAlert('billsAlert','Insufficient balance','error'); return; } u.balance -= amount; const timestamp = new Date().toISOString(); u.transactions.push({id:Date.now(), type:'debit', amount, desc:`Paid ${currentBillService} - ${acct}`, date:timestamp, balance:u.balance}); saveUsers(); showAlert('billsAlert',`Paid ₹${amount.toFixed(2)} for ${currentBillService}`,'success'); updateDashboard(); updateTransactions(); document.getElementById('billAccount').value=''; document.getElementById('billAmount').value=''; document.getElementById('billPin').value=''; }
+
+    // --- QR scan and paste processing ---
+    let qrStream = null; let qrScanInterval = null;
+    async function startQRScan(){
+        const video = document.getElementById('qrVideo');
+        const container = document.getElementById('qrVideoContainer');
+        if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ showAlert('qrAlert','Camera not supported. Use paste.', 'error'); return; }
+        try{
+            const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+            qrStream = stream; video.srcObject = stream; container.style.display='block';
+            await video.play();
+            if(window.BarcodeDetector){
+                const detector = new BarcodeDetector({formats:['qr_code']});
+                qrScanInterval = setInterval(async ()=>{
+                    try{
+                        const codes = await detector.detect(video);
+                        if(codes && codes.length){ parseQRPayload(codes[0].rawValue); stopQRScan(); }
+                    }catch(e){ /* ignore frame errors */ }
+                },400);
+            }else{
+                // fallback: capture image frames and try to decode via canvas if needed - but we'll use paste fallback
+                showAlert('qrAlert','Camera scanning started — your browser may not support native QR detection. Use paste if it fails.','success');
+            }
+        }catch(err){ showAlert('qrAlert','Camera access denied or error','error'); }
+    }
+    function stopQRScan(){ if(qrStream){ qrStream.getTracks().forEach(t=>t.stop()); qrStream=null; } const video = document.getElementById('qrVideo'); video.pause(); document.getElementById('qrVideoContainer').style.display='none'; if(qrScanInterval){ clearInterval(qrScanInterval); qrScanInterval=null; } }
+
+    function processQRPaste(){ const payload = document.getElementById('qrPaste').value.trim(); if(!payload) return showAlert('qrAlert','Paste QR payload','error'); parseQRPayload(payload); }
+
+    function parseQRPayload(payload){
+        // support: pay:PHONE:AMOUNT
+        // service:TYPE:ACCOUNT:AMOUNT
+        // unipay://pay?to=...&amount=...
+        let p = payload.trim();
+        if(p.startsWith('unipay://')){
+            try{
+                const url = new URL(p);
+                const to = url.searchParams.get('to'); const amount = parseFloat(url.searchParams.get('amount'));
+                if(to && amount) return payToPhone(to, amount);
+            }catch(e){}
+        }
+        const parts = p.split(':');
+        if(parts[0]==='pay' && parts.length>=3){ const to=parts[1]; const amt=parseFloat(parts[2]); return payToPhone(to,amt); }
+        if(parts[0]==='service' && parts.length>=4){ const svc=parts[1]; const acct=parts[2]; const amt=parseFloat(parts[3]); return payServicePayload(svc,acct,amt); }
+        showAlert('qrAlert','Unsupported QR payload','error');
+    }
+
+    function payToPhone(phone, amount){ if(!currentUser) return showAlert('qrAlert','Login first','error'); const recipient = users[phone]; if(!recipient) return showAlert('qrAlert','Recipient not found','error'); if(amount<=0||amount>users[currentUser].balance) return showAlert('qrAlert','Insufficient balance','error'); users[currentUser].balance -= amount; recipient.balance = (recipient.balance||0)+amount; const ts=new Date().toISOString(); users[currentUser].transactions.push({id:Date.now(),type:'debit',amount,desc:`Sent via QR to ${phone}`,date:ts,balance:users[currentUser].balance}); recipient.transactions.push({id:Date.now()+1,type:'credit',amount,desc:`Received via QR from ${currentUser}`,date:ts,balance:recipient.balance}); saveUsers(); updateDashboard(); updateTransactions(); showAlert('qrAlert',`Sent ₹${amount} to ${phone}`,'success'); }
+
+    function payServicePayload(service,acct,amount){ if(!currentUser) return showAlert('qrAlert','Login first','error'); if(amount<=0||amount>users[currentUser].balance) return showAlert('qrAlert','Insufficient balance','error'); users[currentUser].balance -= amount; const ts=new Date().toISOString(); users[currentUser].transactions.push({id:Date.now(),type:'debit',amount,desc:`Paid ${service} (${acct}) via QR`,date:ts,balance:users[currentUser].balance}); saveUsers(); updateDashboard(); updateTransactions(); showAlert('qrAlert',`Paid ₹${amount} for ${service}`,'success'); }
+
+    // --- Personal QR generation ---
+    function generatePersonalQR(){ if(!currentUser) return showAlert('subsAlert','Login to see QR','error'); const u = users[currentUser]; const payload = `unipay://user?phone=${u.phone}&wallet=${u.walletId}`; const img = document.getElementById('personalQrImg'); const canvas = document.getElementById('personalQrCanvas'); QRCode.toDataURL(payload, {width:300}, function(err,url){ if(err){ showAlert('subsAlert','QR generation failed','error'); return; } img.src = url; img.style.display='block'; canvas.style.display='none'; }); }
+
+    // --- Subscriptions ---
+    function createSubscription(){ if(!currentUser) return showAlert('subsAlert','Login first','error'); const svc=document.getElementById('subService').value; const payee=document.getElementById('subPayee').value.trim(); const amt=parseFloat(document.getElementById('subAmount').value); const next=document.getElementById('subNextDate').value; const freq=document.getElementById('subFreq').value; if(!payee||!amt||!next) return showAlert('subsAlert','Fill all fields','error'); const subs = loadSubs(); if(!subs[currentUser]) subs[currentUser]=[]; const id = Date.now().toString(36); subs[currentUser].push({id,service:svc,payee,amount:amt,nextDate:next,freq}); saveSubs(subs); showAlert('subsAlert','Subscription created','success'); renderSubscriptions(); }
+
+    function renderSubscriptions(){ const subs = loadSubs(); const list = subs[currentUser]||[]; const container = document.getElementById('subsList'); if(!container) return; if(list.length===0){ container.innerHTML='No subscriptions'; return; } container.innerHTML = list.map(s=>`<div style="padding:8px;border-bottom:1px solid #eee"><strong>${s.service}</strong> — ₹${s.amount} — Next: ${s.nextDate} <button style="float:right" onclick="cancelSub('${s.id}')">Cancel</button></div>`).join(''); }
+
+    function cancelSub(id){ const subs = loadSubs(); if(!subs[currentUser]) return; subs[currentUser]=subs[currentUser].filter(s=>s.id!==id); saveSubs(subs); renderSubscriptions(); showAlert('subsAlert','Subscription cancelled','success'); }
+
+    function processDueSubscriptions(){ const subs = loadSubs(); const allPhones = Object.keys(subs); const today = new Date(); let changed=false; for(const phone of allPhones){ const arr = subs[phone]; for(const s of arr){ const next = new Date(s.nextDate + 'T00:00:00'); if(next <= today){ // attempt payment
+                    const u = users[phone]; if(!u) continue; if(u.balance >= s.amount){ u.balance -= s.amount; const ts = new Date().toISOString(); u.transactions.push({id:Date.now(),type:'debit',amount:s.amount,desc:`Subscription ${s.service}`,date:ts,balance:u.balance}); // advance next by one month
+                            const nd = new Date(next); nd.setMonth(nd.getMonth()+1); s.nextDate = nd.toISOString().slice(0,10); changed=true; saveUsers(); }
+                }
+            }
+        }
+        if(changed) saveSubs(subs);
+    }
+
+    // --- Init ---
+    loadUsers(); // ensure users available
+    // process subscriptions at startup and every minute
+    processDueSubscriptions();
+    setInterval(processDueSubscriptions, 60*1000);
+
+    // Send Money implementation
+    function sendMoney(){
+        if(!currentUser) return showAlert('sendAlert','Login first','error');
+        const recipient = document.getElementById('recipient').value.trim();
+        const amount = parseFloat(document.getElementById('sendAmount').value);
+        const pin = document.getElementById('sendPin').value.trim();
+        if(!recipient || !amount || !pin) return showAlert('sendAlert','Please fill all fields','error');
+        const sender = users[currentUser];
+        if(pin !== sender.pin) return showAlert('sendAlert','Incorrect PIN','error');
+        if(amount <= 0 || amount > sender.balance) return showAlert('sendAlert','Invalid or insufficient amount','error');
+        const recipientUser = users[recipient] || Object.values(users).find(u=>u.walletId===recipient);
+        if(!recipientUser) return showAlert('sendAlert','Recipient not found','error');
+        sender.balance -= amount;
+        recipientUser.balance = (recipientUser.balance||0) + amount;
+        const ts = new Date().toISOString();
+        sender.transactions.push({id:Date.now(), type:'debit', amount, desc:`Sent to ${recipientUser.name||recipient}`, date:ts, balance:sender.balance});
+        recipientUser.transactions.push({id:Date.now()+1, type:'credit', amount, desc:`Received from ${sender.name||currentUser}`, date:ts, balance:recipientUser.balance});
+        saveUsers(); updateDashboard(); updateTransactions(); showAlert('sendAlert',`₹${amount.toFixed(2)} sent to ${recipientUser.name||recipient}`,'success');
+        document.getElementById('recipient').value=''; document.getElementById('sendAmount').value=''; document.getElementById('sendPin').value='';
+    }
+
+    // Expose small functions to global scope used by onclick attributes
+    window.showPage = showPage; window.showTab = showTab; window.register = register; window.login = login; window.logout = logout; window.sendMoney = sendMoney; window.topUp = topUpFallback;
+
+    // small compatibility topUp used earlier
+    function topUpFallback(){ const code = document.getElementById('voucherCode').value.trim().toUpperCase(); const vouchers = { 'UNIPAY100':100,'UNIPAY500':500,'UNIPAY1000':1000,'UNIPAY5000':5000 }; if(!currentUser) return showAlert('topupAlert','Please login','error'); if(!code) return showAlert('topupAlert','Enter voucher code','error'); const amount = vouchers[code]; if(!amount) return showAlert('topupAlert','Invalid voucher code','error'); users[currentUser].balance += amount; users[currentUser].transactions.push({id:Date.now(),type:'credit',amount,desc:'Voucher Top-up',date:new Date().toISOString(),balance:users[currentUser].balance}); saveUsers(); updateDashboard(); updateTransactions(); showAlert('topupAlert',`₹${amount} added`,'success'); document.getElementById('voucherCode').value=''; }
+
+    // Make sure UI shows login page initially
+    showPage('loginPage');
+    </script>
+
+
+</body>
+</html>
+
